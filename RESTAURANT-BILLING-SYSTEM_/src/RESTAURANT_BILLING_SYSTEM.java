@@ -770,7 +770,7 @@ try{
         Class.forName("com.mysql.cj.jdbc.Driver");
     
             try ( // establish connection
-                    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/demo1?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "root")) {
+                    Connection conn = DriverManager.getConnection("jdbc:mysql://mysql:3306/demo1?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "root")) {
                 Statement stmt = conn.createStatement();
                 String sql = "INSERT INTO demo1.bill_reciect (Customer_Name, Customer_Number, Custome_Address, Cost_Of_Meal, Cost_Of_Drinks, Cost_Of_Delivery, Tax, Total_Amount) VALUES ('" + Name + "', " + Num + ", '" + Add + "', " + com + ", " + cod + ", " + delivery + ", " + tax + ", " + totalamt + ")";
                 stmt.executeUpdate(sql);

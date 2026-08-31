@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Java Application') {
+            steps {
+                sh 'ant clean jar'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t restaurant-billing:latest .'
+            }
+        }
+
+        stage('Deploy MySQL') {
+            steps {
+                sh '''
+                    docker compose up -d mysql
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh '''
+                    docker ps
+                    docker volume ls
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'CI/CD completed successfully!'
+        }
+
+        failure {
+            echo 'CI/CD failed. Check the Jenkins console output.'
+        }
+    }
+}

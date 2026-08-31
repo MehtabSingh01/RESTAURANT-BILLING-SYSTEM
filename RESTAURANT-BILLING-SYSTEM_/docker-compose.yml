@@ -1,0 +1,24 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: restaurant-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: demo1
+    volumes:
+      - restaurant_mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+  restaurant-app:
+    image: restaurant-billing:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restaurant-billing
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+volumes:
+  restaurant_mysql_data:
