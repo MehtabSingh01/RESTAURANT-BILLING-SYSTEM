@@ -9,43 +9,33 @@ pipeline {
             }
         }
 
-        stage('Build Java Application') {
-            steps {
-                sh 'ant clean jar'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t restaurant-billing:latest .'
+                bat 'docker build -t restaurant-billing:latest .'
             }
         }
 
         stage('Deploy MySQL') {
             steps {
-                sh '''
-                    docker compose up -d mysql
-                '''
+                bat 'docker compose up -d mysql'
             }
         }
 
-        stage('Verify Deployment') {
+        stage('Verify Docker') {
             steps {
-                sh '''
-                    docker ps
-                    docker volume ls
-                '''
+                bat 'docker ps'
+                bat 'docker volume ls'
             }
         }
     }
 
     post {
         success {
-            echo 'CI/CD completed successfully!'
+            echo 'Restaurant Billing System Docker deployment completed!'
         }
 
         failure {
-            echo 'CI/CD failed. Check the Jenkins console output.'
+            echo 'Docker deployment failed. Check the Jenkins console output.'
         }
     }
 }
