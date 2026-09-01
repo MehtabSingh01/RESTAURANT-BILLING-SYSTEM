@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER = 'C:\\Users\\mehta\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
+        DOCKER_COMPOSE = 'C:\\Users\\mehta\\AppData\\Local\\Programs\\DockerDesktop\\resources\\cli-plugins\\docker-compose.exe'
     }
 
     stages {
@@ -17,7 +18,7 @@ pipeline {
             steps {
                 bat '''
                     "%DOCKER%" --version
-                    "%DOCKER%" compose version
+                    "%DOCKER_COMPOSE%" version
                     "%DOCKER%" ps
                 '''
             }
@@ -36,21 +37,12 @@ pipeline {
             steps {
                 bat '''
                     cd RESTAURANT-BILLING-SYSTEM_
-                    "%DOCKER%" compose up -d mysql
+                    "%DOCKER_COMPOSE%" -f docker-compose.yml up -d mysql
                 '''
             }
         }
 
-        stage('Start Application') {
-            steps {
-                bat '''
-                    cd RESTAURANT-BILLING-SYSTEM_
-                    "%DOCKER%" compose up -d restaurant-app
-                '''
-            }
-        }
-
-        stage('Verify Containers') {
+        stage('Verify MySQL') {
             steps {
                 bat '''
                     "%DOCKER%" ps
@@ -63,19 +55,18 @@ pipeline {
     post {
         success {
             echo '=========================================='
-            echo 'RESTAURANT BILLING SYSTEM DEPLOYED'
+            echo 'RESTAURANT BILLING SYSTEM DEPLOYMENT OK'
+            echo '=========================================='
             echo 'Docker image built successfully.'
             echo 'MySQL container started.'
-            echo 'Application container started.'
-            echo 'Database volume is preserved.'
-            echo '=========================================='
+            echo 'Docker volume verified.'
         }
 
         failure {
             echo '=========================================='
             echo 'DOCKER DEPLOYMENT FAILED'
-            echo 'Check the Console Output for the error.'
             echo '=========================================='
+            echo 'Check the Console Output for the error.'
         }
     }
 }
