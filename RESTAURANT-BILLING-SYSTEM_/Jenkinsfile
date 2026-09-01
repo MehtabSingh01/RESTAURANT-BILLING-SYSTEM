@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER = 'C:\\Users\\mehta\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -9,11 +13,21 @@ pipeline {
             }
         }
 
+        stage('Check Docker') {
+            steps {
+                bat '''
+                    "%DOCKER%" --version
+                    "%DOCKER%" compose version
+                    "%DOCKER%" ps
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 bat '''
                     cd RESTAURANT-BILLING-SYSTEM_
-                    docker build -t restaurant-billing:latest .
+                    "%DOCKER%" build -t restaurant-billing:latest .
                 '''
             }
         }
@@ -22,17 +36,25 @@ pipeline {
             steps {
                 bat '''
                     cd RESTAURANT-BILLING-SYSTEM_
-                    docker compose up -d mysql
+                    "%DOCKER%" compose up -d mysql
                 '''
             }
         }
 
-        stage('Verify Docker') {
+        stage('Start Application') {
             steps {
                 bat '''
                     cd RESTAURANT-BILLING-SYSTEM_
-                    docker ps
-                    docker volume ls
+                    "%DOCKER%" compose up -d restaurant-app
+                '''
+            }
+        }
+
+        stage('Verify Containers') {
+            steps {
+                bat '''
+                    "%DOCKER%" ps
+                    "%DOCKER%" volume ls
                 '''
             }
         }
@@ -40,11 +62,20 @@ pipeline {
 
     post {
         success {
-            echo 'Restaurant Billing System Docker deployment completed!'
+            echo '=========================================='
+            echo 'RESTAURANT BILLING SYSTEM DEPLOYED'
+            echo 'Docker image built successfully.'
+            echo 'MySQL container started.'
+            echo 'Application container started.'
+            echo 'Database volume is preserved.'
+            echo '=========================================='
         }
 
         failure {
-            echo 'Docker deployment failed. Check the Jenkins console output.'
+            echo '=========================================='
+            echo 'DOCKER DEPLOYMENT FAILED'
+            echo 'Check the Console Output for the error.'
+            echo '=========================================='
         }
     }
 }
