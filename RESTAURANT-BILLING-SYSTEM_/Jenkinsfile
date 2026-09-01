@@ -11,20 +11,29 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t restaurant-billing:latest .'
+                bat '''
+                    cd RESTAURANT-BILLING-SYSTEM_
+                    docker build -t restaurant-billing:latest .
+                '''
             }
         }
 
         stage('Deploy MySQL') {
             steps {
-                bat 'docker compose up -d mysql'
+                bat '''
+                    cd RESTAURANT-BILLING-SYSTEM_
+                    docker compose up -d mysql
+                '''
             }
         }
 
         stage('Verify Docker') {
             steps {
-                bat 'docker ps'
-                bat 'docker volume ls'
+                bat '''
+                    cd RESTAURANT-BILLING-SYSTEM_
+                    docker ps
+                    docker volume ls
+                '''
             }
         }
     }
